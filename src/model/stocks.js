@@ -2,6 +2,11 @@ const { DataTypes } = require("sequelize")
 const db = require("./connection")
 
 const stocks = db.sequelize.define("stocks", {
+  id: {
+    type: DataTypes.UUID,
+    defaultValue: DataTypes.UUIDV4,
+    primaryKey: true
+  },
   name: {
     type: DataTypes.STRING,
     allowNull: false
@@ -29,6 +34,11 @@ const stocks = db.sequelize.define("stocks", {
 })
 
 const incoming_stock_transaction = db.sequelize.define("incoming_stock_transaction", {
+  id: {
+    type: DataTypes.UUID,
+    defaultValue: DataTypes.UUIDV4,
+    primaryKey: true
+  },
   name: {
     type: DataTypes.STRING,
     allowNull: false
@@ -60,6 +70,11 @@ const incoming_stock_transaction = db.sequelize.define("incoming_stock_transacti
 })
 
 const outgoing_stock_transaction = db.sequelize.define("outgoing_stock_transaction", {
+  id: {
+    type: DataTypes.UUID,
+    defaultValue: DataTypes.UUIDV4,
+    primaryKey: true
+  },
   buyer_name: {
     type: DataTypes.STRING,
     allowNull: false
@@ -93,3 +108,9 @@ const outgoing_stock_transaction = db.sequelize.define("outgoing_stock_transacti
     allowNull: false
   }
 })
+
+module.exports = {
+  stocks,
+  incoming_stock_transaction,
+  outgoing_stock_transaction
+}
