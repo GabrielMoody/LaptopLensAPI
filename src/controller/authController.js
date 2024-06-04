@@ -1,8 +1,10 @@
+require('dotenv').config()
 const bcrypt = require("bcrypt")
 const Users = require("../model/userModel.js")
 const jwt = require("jsonwebtoken")
 const Joi = require("joi")
 const passwordComplexity = require("joi-password-complexity")
+const nodemailer = require('nodemailer')
 
 
 
@@ -63,23 +65,44 @@ const Register = async(req,res) => {
 
 const Login = async(req, res) => {
     try {
-        const user = await Users.findAll({
+        const user = await Users.findOne({
             where:{
                 email: req.body.email
             }
         });
-        const match = await bcrypt.compare(req.body.password, user[0].password);
+
+        if (!user) return res.status(404).json({ msg: "Email not found" });
+        
+
+
+        const match = await bcrypt.compare(req.body.password, user.password);
         if(!match) return res.status(400).json({msg:"Invalid Password"});
-        const userId = user[0].id;
-        const first_name = user[0].first_name;
-        const last_name = user[0].last_name;
-        const email = user[0].email;
+        
+        const userId = user.id;
+        const first_name = user.first_name;
+        const last_name = user.last_name;
+        const email = user.email;
+        
         const accessToken = jwt.sign({userId, first_name, last_name, email}, process.env.SECRET_TOKEN,{
             expiresIn: '60s'
         });
+        const refreshToken = jwt.sign({ userId, first_name, last_name, email }, process.env.REFRESH_TOKEN, {
+            expiresIn: '7d' 
+        });
+        await Users.update({ token_refresh: refreshToken }, {
+            where: {
+                id: userId
+            }
+        });
+
+        res.cookie('refreshToken', refreshToken, {
+            httpOnly: true,
+            sameSite: 'strict',
+            maxAge: 7 * 24 * 60 * 60 * 1000 
+        });
         res.json({accessToken});
     } catch (error) {
-        res.status(404).json({msg:"Email does not find"});
+        res.status(500).json({msg:"Server error"});
     }
 };
 
@@ -126,7 +149,7 @@ const forgotPassword = async (req, res) => {
 
 const Logout = async(req,res) => {
     const refreshToken = req.cookies.refreshToken;
-    if(!refreshToken) return res.sendstatus(204);
+    if(!refreshToken) return res.sendStatus(204);
     const user = await Users.findAll({
         where:{
             token_refresh: refreshToken
