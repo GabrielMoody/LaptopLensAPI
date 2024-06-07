@@ -3,12 +3,14 @@ const express = require('express')
 const stocks = require("./routes")
 const db = require("../model/connection")
 
+// const tf = require('@tensorflow/tfjs-node');
+
 const app = express()
 
 app.use(express.json())
 app.use(express.urlencoded({extended: true}))
 
-db.sequelize.sync({force: true}).then(() => {
+db.sequelize.sync().then(() => {
   console.log("Drop db")
 })
 

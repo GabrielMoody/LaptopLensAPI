@@ -1,0 +1,290 @@
+openapi: 3.0.0
+info:
+  title: Laptop Lens API
+  description: "API to serve the stocks data"
+  version: 1.0.0
+servers:
+  - url: http://localhost/
+paths:
+  /login:
+    post: 
+      tags:
+        - "Authentication & Authorization"
+      summary: "Login user"
+      requestBody:
+        content:
+          application/json:
+            schema: 
+              type: object
+              properties:
+                username:
+                  type: string
+                password:
+                  type: string
+      responses:
+        '200':
+          description: "User login"
+          content:
+            application/json:
+              schema: 
+                type: object
+                properties:
+                  status:
+                    type: string
+                  data:
+                    type: string
+        '400': 
+          description: "Failed to login"
+          content:
+            application/json:
+              schema: 
+                type: object
+                properties:
+                  status:
+                    type: string
+                  message:
+                    type: string
+  /register:
+    post:
+      tags:
+        - "Authentication & Authorization"
+      summary: "Register new account"
+      requestBody:
+        content:
+          application/json:
+            schema: 
+              type: object
+              properties:
+                first_name:
+                  type: string
+                last_name:
+                  type: string
+                email:
+                  type: string
+                password:
+                  type: string
+                confirmation_password:
+                  type: string
+      responses:
+        '201':
+          description: "Success register new account"
+          content:
+            application/json:
+              schema: 
+                type: object
+                properties:
+                  status: 
+                    type: string
+                  message:
+                    type: string
+        '400':
+          description: "Failed register new account"
+          content:
+            application/json:
+              schema: 
+                type: object
+                properties:
+                  status: 
+                    type: string
+                  message:
+                    type: string
+  /stocks:
+    get:
+      tags:
+        - "Stocks API"
+      summary: "Return all stocks data"
+      parameters:
+        - in: query
+          name: name
+          schema: 
+            type: string
+          description: "Find stock by name"
+      responses:
+        '200':
+          description: "List of stocks"
+          content: 
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status: 
+                    type: string
+                  data: 
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/stocks"
+        '404':
+          description: "Data not found"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                  message:
+                    type: string
+  /stocks/{id}:
+    get:
+      tags:
+        - "Stocks API"
+      summary: "Return stock data by ID"
+      parameters:
+        - in: path
+          name: "id"
+          description: "Stocks ID"
+          schema:
+            type: string
+          required: true
+      responses:
+        '200':
+          description: "Single stock data"
+          content: 
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status: 
+                    type: string
+                  data:
+                    type: object
+                    $ref: '#/components/schemas/stocks'
+        '404':
+          description: "Data not found"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                  message:
+                    type: string
+  /stocks/incoming:
+    post:
+      tags:
+        - "Stocks API"
+      summary: "Insert incoming transaction data"
+      requestBody:
+        content:
+          application/json:
+            schema: 
+              type: object
+              $ref: "#/components/schemas/incoming_stocks"
+      responses:
+        '201':
+          description: "Success insert data"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                  data:
+                    type: object
+                    $ref: "#/components/schemas/incoming_stocks"
+        '400':
+          description: "Failed to insert data"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                  message:
+                    type: string
+  /stocks/outgoing:
+    post:
+      tags:
+        - "Stocks API"
+      summary: "Insert incoming transaction data"
+      requestBody:
+        content:
+          application/json:
+            schema: 
+              type: object
+              properties:
+                name:
+                  type: string
+                price:
+                  type: number
+                date:
+                  type: string
+                sales:
+                  type: number
+      responses:
+        '201':
+          description: "Success insert data"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                  data:
+                    type: object
+                    properties:
+                      id:
+                        type: number
+                      name:
+                        type: string
+                      price:
+                        type: number
+                      date:
+                        type: string
+                      sales:
+                        type: number
+        '400':
+          description: "Failed to insert data"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                  message:
+                    type: string
+
+components:
+  securitySchemes:
+    firebase:
+      type: oauth2
+      flows:
+        implicit:
+          authorizationUrl: http://localhost/login
+          scopes:
+            read: "Read stocks data"
+            write: "Write stocks data"
+            
+  schemas:
+    stocks:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        category:
+          type: string
+        price:
+          type: number
+        total_stocks:
+          type: number
+
+    incoming_stocks:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        price: 
+          type: number
+        date:
+          type: string
+        sales:
+          type: number
