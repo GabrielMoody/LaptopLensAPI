@@ -4,7 +4,7 @@ info:
   description: "API to serve the stocks data"
   version: 1.0.0
 servers:
-  - url: http://localhost/
+  - url: http://localhost:3000/
 paths:
   /login:
     post: 
@@ -90,6 +90,8 @@ paths:
                     type: string
   /stocks:
     get:
+      security:
+        - firebaseAuth: []
       tags:
         - "Stocks API"
       summary: "Return all stocks data"
@@ -126,6 +128,8 @@ paths:
                     type: string
   /stocks/{id}:
     get:
+      security:
+          - firebaseAuth: []
       tags:
         - "Stocks API"
       summary: "Return stock data by ID"
@@ -162,6 +166,8 @@ paths:
                     type: string
   /stocks/incoming:
     post:
+      security:
+        - firebaseAuth: []
       tags:
         - "Stocks API"
       summary: "Insert incoming transaction data"
@@ -183,7 +189,17 @@ paths:
                     type: string
                   data:
                     type: object
-                    $ref: "#/components/schemas/incoming_stocks"
+                    properties:
+                      id:
+                        type: number
+                      name:
+                        type: string
+                      price: 
+                        type: number
+                      date:
+                        type: string
+                      quantity:
+                        type: number
         '400':
           description: "Failed to insert data"
           content:
@@ -196,10 +212,12 @@ paths:
                   message:
                     type: string
   /stocks/outgoing:
-    post:
+    post:      
       tags:
         - "Stocks API"
-      summary: "Insert incoming transaction data"
+      security:
+        - firebaseAuth: []
+      summary: "Insert outgoing transaction data"
       requestBody:
         content:
           application/json:
@@ -212,7 +230,7 @@ paths:
                   type: number
                 date:
                   type: string
-                sales:
+                quantity:
                   type: number
       responses:
         '201':
@@ -251,15 +269,9 @@ paths:
 
 components:
   securitySchemes:
-    firebase:
-      type: oauth2
-      flows:
-        implicit:
-          authorizationUrl: http://localhost/login
-          scopes:
-            read: "Read stocks data"
-            write: "Write stocks data"
-            
+    firebaseAuth:
+      type: http
+      scheme: bearer
   schemas:
     stocks:
       type: object
@@ -274,17 +286,16 @@ components:
           type: number
         total_stocks:
           type: number
-
     incoming_stocks:
       type: object
       properties:
-        id:
-          type: string
         name:
+          type: string
+        vendor_name:
           type: string
         price: 
           type: number
         date:
           type: string
-        sales:
+        quantity:
           type: number

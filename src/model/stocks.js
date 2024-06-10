@@ -21,7 +21,10 @@ const stocks = db.sequelize.define("stocks", {
   },
   total_stocks: {
     type: DataTypes.INTEGER,
-    allowNull: false
+    allowNull: false,
+    validate: {
+      min: 0
+    }
   },
 })
 
@@ -44,7 +47,7 @@ const incoming_stock_transaction = db.sequelize.define("incoming_stock_transacti
     allowNull: false
   }, 
   date: {
-    type: DataTypes.DATE,
+    type: DataTypes.DATEONLY,
     allowNull: false
   }, 
   sales: {
@@ -68,7 +71,7 @@ const outgoing_stock_transaction = db.sequelize.define("outgoing_stock_transacti
     allowNull: false
   }, 
   date: {
-    type: DataTypes.DATE,
+    type: DataTypes.DATEONLY,
     allowNull: false
   }, 
   sales: {
