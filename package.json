@@ -1,18 +1,36 @@
 {
-  "name": "LaptopLensAPI",
+  "name": "laptoplensapi",
   "version": "1.0.0",
-  "description": "",
   "main": "index.js",
   "scripts": {
-    "start-dev": "nodemon src/server.js"
+    "start-dev": "nodemon src/server/server.js",
+    "start": "node src/server/server.js"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "devDependencies": {
-    "nodemon": "^3.1.1"
+    "nodemon": "^3.1.3"
   },
   "dependencies": {
-    "@hapi/hapi": "^21.3.9"
-  }
+    "@google-cloud/firestore": "^7.8.0",
+    "@hapi/hapi": "^21.3.9",
+    "@tensorflow/tfjs-node": "^4.20.0",
+    "cors": "^2.8.5",
+    "csv-parser": "^3.0.0",
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "multer": "^1.4.5-lts.1",
+    "papaparse": "^5.4.1",
+    "uuid": "^10.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/GabrielMoody/LaptopLensAPI.git"
+  },
+  "bugs": {
+    "url": "https://github.com/GabrielMoody/LaptopLensAPI/issues"
+  },
+  "homepage": "https://github.com/GabrielMoody/LaptopLensAPI#readme",
+  "description": ""
 }
