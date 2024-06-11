@@ -1,7 +1,6 @@
 {
-  "name": "LaptopLensAPI",
+  "name": "laptoplensapi",
   "version": "1.0.0",
-  "description": "",
   "main": "index.js",
   "scripts": {
     "start-dev": "nodemon server.js",
@@ -24,6 +23,20 @@
     "json2csv": "^6.0.0-alpha.2",
     "moment": "^2.30.1",
     "mysql2": "^3.9.8",
-    "sequelize": "^6.37.3"
-  }
+    "sequelize": "^6.37.3",
+    "@google-cloud/firestore": "^7.8.0",
+    "@tensorflow/tfjs-node": "^4.20.0",
+    "multer": "^1.4.5-lts.1",
+    "csv-parser": "^3.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/GabrielMoody/LaptopLensAPI.git"
+  },
+  "bugs": {
+    "url": "https://github.com/GabrielMoody/LaptopLensAPI/issues"
+  },
+  "homepage": "https://github.com/GabrielMoody/LaptopLensAPI#readme",
+  "description": ""
 }
+
