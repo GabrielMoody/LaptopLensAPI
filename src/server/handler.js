@@ -2,12 +2,16 @@ const fs = require('fs');
 const parseCSV = require('../services/csvParser');
 const tf = require ('@tensorflow/tfjs-node')
 const loadModel = require('../services/loadModel');
+const storeData = require('../services/storeData');
+const { Firestore } = require('@google-cloud/firestore');
 
 async function handlePrediction(req, res) {
     try {
         const models = await loadModel();
         const data = await parseCSV(req.file.path);
         const predictions = await predictSales(data, models);
+        
+        await storeData(predictions);
 
         res.json(predictions);
     } catch (error) {
@@ -75,7 +79,7 @@ function preparePlotDataLast6Months(data, predictedSales) {
     return last6MonthsSales;
 }
 
-function predictNextWeekSales(data, model, windowSize = 12) {
+async function predictNextWeekSales(data, model, windowSize = 12) {
     const weeklySalesData = [];
     let currentWeek = [];
     for (const item of data) {
@@ -120,5 +124,48 @@ function predictNextWeekSales(data, model, windowSize = 12) {
     return dailyPredictions;
 }
 
-module.exports = { handlePrediction };
+function convertTimestampToDate(timestamp) {
+    if (timestamp && timestamp._seconds) {
+        return new Date(timestamp._seconds * 1000);
+    }
+    return null;
+}
 
+async function getLastPrediction() {
+    const db = new Firestore();
+    
+    const snapshot = await db.collection('predictions').orderBy('date', 'desc').limit(1).get();
+    if (snapshot.empty) {
+      throw new Error('No predictions found');
+    }
+  
+    let lastPrediction;
+    snapshot.forEach(doc => {
+      lastPrediction = doc.data();
+
+      if (lastPrediction.result) {
+        ['low', 'mid', 'high'].forEach(category => {
+            if (lastPrediction.result[category]) {
+                lastPrediction.result[category] = lastPrediction.result[category].map(entry => ({
+                    ...entry,
+                    date: convertTimestampToDate(entry.date)  // Konversi timestamp ke Date
+                }));
+            }
+        });
+    }
+    });
+  
+    return lastPrediction;
+  }
+  
+async function handleGetLastPrediction(req, res) {
+    try {
+      const lastPrediction = await getLastPrediction();
+      res.status(200).json(lastPrediction);
+    } catch (error) {
+      res.status(500).json({ error: 'Error getting last prediction: ' + error.message });
+    }
+  }
+
+
+module.exports = { handlePrediction, handleGetLastPrediction };
