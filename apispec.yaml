@@ -4,7 +4,7 @@ info:
   description: "API to serve the stocks data"
   version: 1.0.0
 servers:
-  - url: http://localhost:3000/
+  - url: http://localhost:8080/
 paths:
   /login:
     post: 
@@ -17,7 +17,7 @@ paths:
             schema: 
               type: object
               properties:
-                username:
+                email:
                   type: string
                 password:
                   type: string
@@ -33,7 +33,7 @@ paths:
                     type: string
                   data:
                     type: string
-        '400': 
+        '401': 
           description: "Failed to login"
           content:
             application/json:
@@ -44,7 +44,7 @@ paths:
                     type: string
                   message:
                     type: string
-  /register:
+  /signup:
     post:
       tags:
         - "Authentication & Authorization"
@@ -55,15 +55,15 @@ paths:
             schema: 
               type: object
               properties:
-                first_name:
+                firstName:
                   type: string
-                last_name:
+                lastName:
                   type: string
                 email:
                   type: string
                 password:
                   type: string
-                confirmation_password:
+                confirmPassword:
                   type: string
       responses:
         '201':
@@ -85,6 +85,23 @@ paths:
                 type: object
                 properties:
                   status: 
+                    type: string
+                  message:
+                    type: string
+  /logout:
+    post: 
+      tags:
+        - "Authentication & Authorization"
+      summary: "Logout account"
+      responses:
+        '200':
+          description: "Success to logout"
+          content:
+            application/json:
+              schema: 
+                type: object
+                properties:
+                  status:
                     type: string
                   message:
                     type: string
@@ -266,6 +283,58 @@ paths:
                     type: string
                   message:
                     type: string
+  /predict:
+    post: 
+      tags:
+        - "Stocks API"
+      security:
+        - firebaseAuth: []
+      summary: "Predict sales"
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                csv_file:
+                  type: string
+                  format: binary
+                  description: The CSV file to upload
+      responses:
+        '200':
+          description: "Success predict data"
+          content:
+            application/json:
+              schema: 
+                type: object
+                properties:
+                  status:
+                    type: string
+                  data:
+                    type: array
+  /stocks/export:
+    post:      
+      tags:
+        - "Stocks API"
+      security:
+        - firebaseAuth: []
+      summary: "Export data to csv"
+      parameters:
+        - in: query
+          name: month
+          schema: 
+            type: number
+          description: "Filter by month"
+      responses:
+        '201':
+          description: "Success export data"
+          content:
+            application/csv:
+              schema:
+                type: string
+                format: binary
+
 
 components:
   securitySchemes:

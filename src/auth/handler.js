@@ -2,7 +2,7 @@ const admin = require("firebase-admin");
 const axios = require("axios");
 require('dotenv').config();
 
-const serviceAccount = require("../../secretAccountKey.json");
+const serviceAccount = require("../../laptoplens-firebase-adminsdk-5s93b-1d0087b01e.json");
 
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount),
@@ -10,33 +10,14 @@ admin.initializeApp({
 
 const db = admin.firestore();
 
-const getUsers = async (req, res) => {
-  try {
-    const userList = [];
-    let listUsers = await admin.auth().listUsers();
-    for (let userRecord of listUsers.users) {
-      const user = await admin.auth().getUser(userRecord.uid);
-      const userData = {
-        id: user.uid,
-        firstName: user.firstName,
-        lastName: user.lastName,
-        email: user.email,
-      };
-      userList.push(userData);
-    }
-    res.json(userList);
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: "Internal Server Error" });
-  }
-};
-
-
 const postSignUp = async (req, res) => {
   const { firstName, lastName, email, password, confirmPassword } = req.body;
 
   if (password !== confirmPassword) {
-    return res.status(400).json({ error: "Passwords do not match" });
+    return res.status(400).json({ 
+        status: "Failed",
+        message: "Passwords do not match" 
+      });
   }
 
   try {
@@ -57,9 +38,13 @@ const postSignUp = async (req, res) => {
     res.json({ message: "User created successfully", userRecord });
   } catch (error) {
     if (error.code === 'auth/email-already-exists') {
-      res.status(400).json({ error: "Email already used" });
+      res.status(400).json({ 
+        status: "Failed",
+        message: "Email already used" });
     } else {
-      res.status(400).json({ error: error.message });
+      res.status(400).json({ 
+        status: "Failed",
+        message: error.message });
     }
   }
 };
@@ -83,9 +68,12 @@ const postLogIn = async (req, res) => {
 
     const options = { maxAge: expiresIn, httpOnly: true, secure: true };
     res.cookie("session", sessionCookie, options);
+    res.setHeader('Authorization', `Bearer ${idToken}`);
     res.json({ status: "success", message: "Login successful", refreshToken: refreshToken });
   } catch (error) {
-    res.status(401).json({ error: "Email or Password Incorrect" });
+    res.status(401).json({ 
+      status: "Failed",
+      message: "Email or Password Incorrect" });
   }
 };
 
@@ -93,13 +81,17 @@ const refreshToken = async (req, res) => {
     const authorizationHeader = req.headers['authorization'];
   
     if (!authorizationHeader) {
-      return res.status(401).json({ error: 'Authorization header is missing' });
+      return res.status(401).json({ 
+        status: "Failed",
+        message: 'Authorization header is missing' });
     }
   
     const bearerToken = authorizationHeader.split(' ')[1];
   
     if (!bearerToken) {
-      return res.status(401).json({ error: 'Bearer token is missing' });
+      return res.status(401).json({ 
+        status: "Failed",
+        message: 'Bearer token is missing' });
     }
   
     try {
@@ -117,14 +109,17 @@ const refreshToken = async (req, res) => {
       res.cookie("session", sessionCookie, options);
       res.json({ status: "success", idToken: id_token, refreshToken: refresh_token });
     } catch (error) {
-      res.status(401).json({ error: "Invalid refresh token" });
+      res.status(401).json({ 
+        status: "Failed",
+        message: "Invalid refresh token" });
     }
   };
 
 
 const postLogOut = (req, res) => {
   res.clearCookie("session");
+  res.removeHeader("Authorization");
   res.json({ status: "success", message: "Logout successful" });
 };
 
-module.exports = { getUsers, postSignUp, postLogIn, refreshToken, postLogOut };
+module.exports = { postSignUp, postLogIn, refreshToken, postLogOut };
