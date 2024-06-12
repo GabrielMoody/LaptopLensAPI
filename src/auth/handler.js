@@ -1,12 +1,14 @@
-const admin = require("firebase-admin");
+// const admin = require("firebase-admin");
 const axios = require("axios");
 require('dotenv').config();
 
-const serviceAccount = require("../../laptoplens-firebase-adminsdk-5s93b-1d0087b01e.json");
+const admin = require("../firestore-admin-app")
 
-admin.initializeApp({
-  credential: admin.credential.cert(serviceAccount),
-});
+// const serviceAccount = require("../../laptoplens-firebase-adminsdk-5s93b-1d0087b01e.json");
+
+// admin.initializeApp({
+//   credential: admin.credential.cert(serviceAccount),
+// });
 
 const db = admin.firestore();
 

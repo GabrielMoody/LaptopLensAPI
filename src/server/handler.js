@@ -4,6 +4,14 @@ const tf = require ('@tensorflow/tfjs-node')
 const loadModel = require('../services/loadModel');
 const storeData = require('../services/storeData');
 const { Firestore } = require('@google-cloud/firestore');
+// const admin = require("firebase-admin");
+const admin = require("../firestore-admin-app")
+
+// const serviceAccount = require("../../laptoplens-firebase-adminsdk-5s93b-1d0087b01e.json");
+
+// admin.initializeApp({
+//   credential: admin.credential.cert(serviceAccount),
+// });
 
 async function handlePrediction(req, res) {
     try {
@@ -132,7 +140,8 @@ function convertTimestampToDate(timestamp) {
 }
 
 async function getLastPrediction() {
-    const db = new Firestore();
+    // const db = new Firestore();
+    const db = admin.firestore();
     
     const snapshot = await db.collection('predictions').orderBy('date', 'desc').limit(1).get();
     if (snapshot.empty) {

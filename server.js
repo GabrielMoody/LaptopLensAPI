@@ -20,8 +20,8 @@ app.use("/stocks", stocks)
 app.use("/", auth)
 app.use("/", predict)
 
-const PORT = 8080
+// const PORT = 8080
 
-app.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}`)
+app.listen(process.env.PORT, '0.0.0.0', () => {
+  console.log(`Server is running on port ${process.env.PORT}`)
 })
