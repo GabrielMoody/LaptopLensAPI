@@ -1,3 +1,4 @@
 /node_modules
 .env
 laptoplens-firebase-adminsdk-5s93b-1d0087b01e.json
+docker-compose.yaml

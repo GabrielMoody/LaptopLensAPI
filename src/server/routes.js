@@ -8,7 +8,6 @@ const upload = multer({ dest: 'uploads/' });
 
 router.post('/predict', upload.single('file'), checkFileType, handlePrediction);
 router.get('/last-prediction', handleGetLastPrediction);
-    
 
 module.exports = router;
 

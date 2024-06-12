@@ -1,9 +1,10 @@
 const admin = require("firebase-admin");
 
 const verifyToken = async (req, res, next) => {  
-  if(req.headers.authorization == null) {
+  if(req.headers.authorization == null || req.headers.authorization.split(' ')[0] != "Bearer") {
     return res.status(403).json({
-      error: "Unauthorized"
+      status: 'Failed', 
+      message: 'Unauthorized'
     })
   }
 
@@ -14,7 +15,7 @@ const verifyToken = async (req, res, next) => {
     req.user = decodedClaims;
     next();
   } catch (error) {
-    res.status(403).json({ error: 'Unauthorized', msg: sessionCookie });
+    res.status(403).json({ status: 'Failed', message: 'Unauthorized' });
   }
 };
 

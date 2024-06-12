@@ -1,5 +1,5 @@
-const { Op, json } = require("sequelize");
-const moment = require('moment')
+const { Op } = require("sequelize");
+const moment = require('moment');
 const { sequelize } = require("../model/connection");
 
 const data_exporter = require('json2csv').Parser;
@@ -229,7 +229,6 @@ async function getCSVData(req, res) {
     res.setHeader("Content-Disposition", "attachment; filename=transaksi_keluar.csv");
 
     res.attachment('transaksi_keluar.csv').send(csv_data)
-
   } catch(e) {
     return res.status(400).json({
       status: "Failed",
