@@ -1,14 +1,7 @@
-// const admin = require("firebase-admin");
 const axios = require("axios");
 require('dotenv').config();
 
-const admin = require("../firestore-admin-app")
-
-// const serviceAccount = require("../../laptoplens-firebase-adminsdk-5s93b-1d0087b01e.json");
-
-// admin.initializeApp({
-//   credential: admin.credential.cert(serviceAccount),
-// });
+const admin = require("../firestore-admin-app");
 
 const db = admin.firestore();
 
@@ -70,6 +63,7 @@ const postLogIn = async (req, res) => {
 
     const options = { maxAge: expiresIn, httpOnly: true, secure: true };
     res.cookie("session", sessionCookie, options);
+    res.cookie("email", email, options);
     res.setHeader('Authorization', `Bearer ${idToken}`);
     res.json({ status: "success", message: "Login successful", refreshToken: refreshToken });
   } catch (error) {
@@ -115,8 +109,7 @@ const refreshToken = async (req, res) => {
         status: "Failed",
         message: "Invalid refresh token" });
     }
-  };
-
+};
 
 const postLogOut = (req, res) => {
   res.clearCookie("session");
@@ -124,4 +117,40 @@ const postLogOut = (req, res) => {
   res.json({ status: "success", message: "Logout successful" });
 };
 
-module.exports = { postSignUp, postLogIn, refreshToken, postLogOut };
+const getUser = async (req, res) => {
+  const email = req.cookies.email
+
+  let uid 
+
+  await admin.auth().getUserByEmail(email)
+  .then((userRecord) => {
+    uid = userRecord.uid
+  })
+  .catch(e => {
+    return res.status(400).json({
+      status: "Failed",
+      message: e
+    })
+  })
+
+  let data = {}
+  await db.collection("users").doc(uid).get().then(user => {
+    data = {
+      firstName: user.data().firstName,
+      lastName: user.data().lastName,
+      email: user.data().email,
+    }
+  }).catch(e => {
+    return res.status(400).json({
+      status: "Failed",
+      message: e
+    })
+  })
+
+  return res.status(200).json({
+    status: "Success",
+    data
+  })
+}
+
+module.exports = { postSignUp, postLogIn, refreshToken, postLogOut, getUser };

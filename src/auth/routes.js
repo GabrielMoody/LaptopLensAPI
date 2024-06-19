@@ -1,5 +1,6 @@
 const express = require("express");
-const { getUsers, postSignUp, postLogIn, refreshToken, postLogOut } = require("./handler");
+const { getUser, postSignUp, postLogIn, refreshToken, postLogOut, forgotPassword } = require("./handler");
+const {verifyToken} = require("./middleware")
 
 const router = express.Router();
 
@@ -7,5 +8,6 @@ router.post('/signUp', postSignUp);
 router.post('/login', postLogIn);
 router.get('/token', refreshToken);
 router.post('/logout', postLogOut);
+router.get('/user', verifyToken, getUser);
 
 module.exports = router;

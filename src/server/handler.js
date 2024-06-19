@@ -140,7 +140,6 @@ function convertTimestampToDate(timestamp) {
 }
 
 async function getLastPrediction() {
-    // const db = new Firestore();
     const db = admin.firestore();
     
     const snapshot = await db.collection('predictions').orderBy('date', 'desc').limit(1).get();
