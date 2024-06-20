@@ -65,7 +65,7 @@ const postLogIn = async (req, res) => {
     res.cookie("session", sessionCookie, options);
     res.cookie("email", email, options);
     res.setHeader('Authorization', `Bearer ${idToken}`);
-    res.json({ status: "success", message: "Login successful", refreshToken: refreshToken });
+    res.json({ status: "success", message: "Login successful", refreshToken: refreshToken, tokenId: idToken });
   } catch (error) {
     res.status(401).json({ 
       status: "Failed",

@@ -1,5 +1,5 @@
 const express = require("express");
-const { getUser, postSignUp, postLogIn, refreshToken, postLogOut, forgotPassword } = require("./handler");
+const { getUser, postSignUp, postLogIn, refreshToken, postLogOut } = require("./handler");
 const {verifyToken} = require("./middleware")
 
 const router = express.Router();
